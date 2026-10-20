@@ -4,6 +4,17 @@ A keyboard lock for cat people, for Linux. One shortcut blocks every key so a ca
 sleep on the keyboard without typing anything. Smart Detect can lock it on its own the moment a paw
 lands. It works the same on GNOME, KDE and other Wayland or X11 desktops.
 
+> [!WARNING]
+> Catlock has been entirely vibe coded: written by an AI assistant from a feature list, with
+> limited human review. It can contain bugs and edge cases nobody has handled yet. It grabs every
+> keyboard on the system, so keep the unlock shortcut in mind and try it on a machine where a stuck
+> keyboard is a nuisance rather than a disaster. If Catlock misbehaves, quitting it (or killing the
+> process) always returns the keyboards to normal.
+
+Inspired by [Cats Lock](https://catslock.app/), the macOS app by Todd Alexander. Catlock is an
+independent Linux reimplementation of its ideas; it shares no code with it and is not affiliated
+with it.
+
 ## Features
 
 | Feature | Notes |
