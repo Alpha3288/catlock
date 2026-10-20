@@ -1,0 +1,39 @@
+# Maintainer: Andrea Niccoli <niccoliandrea@protonmail.com>
+
+pkgname=catlock
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Keyboard lock for cat people, with Smart Detect auto-locking'
+arch=('x86_64' 'aarch64')
+license=('LicenseRef-unknown')
+depends=('gtk4' 'libadwaita' 'alsa-lib' 'glib2' 'cairo' 'gcc-libs' 'glibc')
+makedepends=('cargo' 'git')
+optdepends=('gnome-shell-extension-appindicator: tray icon on GNOME')
+install=catlock.install
+# Built from `make dist` until the repository has a public remote.
+source=("$pkgname-$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+prepare() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo build --frozen --release
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo test --frozen --release
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  make DESTDIR="$pkgdir" PREFIX=/usr install
+}

@@ -1,0 +1,9 @@
+post_install() {
+  echo ">>> Catlock reads keyboards through /dev/input. Add your user to the"
+  echo ">>> input group, then log out and back in:"
+  echo ">>>   sudo usermod -aG input \"\$USER\""
+}
+
+post_upgrade() {
+  echo ">>> Restart Catlock to use the new version: catlock --quit && catlock"
+}
