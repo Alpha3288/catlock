@@ -64,7 +64,13 @@ impl Overlay {
         let mut windows = Vec::new();
         let mut frames = Vec::new();
         let monitors = display.monitors();
-        for i in 0..monitors.n_items() {
+        // GNOME Shell draws nothing behind a fullscreen window, so a translucent
+        // lock screen must be an ordinary maximized window instead. Only
+        // fullscreen can target a monitor, so a translucent lock screen is a
+        // single window on the monitor GNOME picks (the one in use).
+        let translucent = screen.opacity < 1.0;
+        let count = if translucent { monitors.n_items().min(1) } else { monitors.n_items() };
+        for i in 0..count {
             let Some(monitor) = monitors.item(i).and_downcast::<gdk::Monitor>() else { continue };
             let frame = content(screen, shortcut, &purpose, &slot);
             // The background sits on its own layer so transparency fades it
@@ -90,7 +96,11 @@ impl Overlay {
                 click.connect_released(move |_, _, _, _| close(&slot));
                 window.add_controller(click);
             }
-            window.fullscreen_on_monitor(&monitor);
+            if translucent {
+                window.maximize();
+            } else {
+                window.fullscreen_on_monitor(&monitor);
+            }
             window.present();
             windows.push(window);
             frames.push(frame);

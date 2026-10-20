@@ -594,7 +594,7 @@ impl Window {
         opacity.connect_value_changed(move |s| w.edit_profile(|p| p.screen.opacity = s.value() as f32));
         let opacity_row = adw::ActionRow::builder()
             .title("Opacity")
-            .subtitle("Lower lets the desktop show through; text stays solid")
+            .subtitle("Below 100% the desktop shows through, on the monitor in use only")
             .build();
         opacity_row.add_suffix(&opacity);
         // Its own group: a preferences group lists rows above any other widget.
