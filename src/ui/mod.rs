@@ -62,11 +62,18 @@ fn engine_config(cfg: &Config) -> EngineConfig {
     }
 }
 
-/// Where the paw icons live when running from the source tree; installed
-/// copies are found through the regular icon theme.
+/// Where the paw icons live when running a debug build from the source tree.
+/// Release builds find the installed copies through the regular icon theme
+/// and must not embed the build directory.
 pub fn dev_icon_dir() -> Option<&'static str> {
-    let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/data/icons");
-    std::path::Path::new(dir).exists().then_some(dir)
+    #[cfg(debug_assertions)]
+    {
+        let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/data/icons");
+        if std::path::Path::new(dir).exists() {
+            return Some(dir);
+        }
+    }
+    None
 }
 
 impl Controller {
