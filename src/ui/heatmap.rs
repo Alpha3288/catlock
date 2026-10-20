@@ -54,6 +54,19 @@ impl HeatMap {
         Self { widget, heat }
     }
 
+    /// Makes exactly `held` the keys shown as down; the rest cool off.
+    pub fn sync(&self, held: &[u16]) {
+        let mut heat = self.heat.borrow_mut();
+        for (code, h) in heat.iter_mut() {
+            h.held = held.contains(code);
+        }
+        for &code in held {
+            heat.entry(code).or_insert(Heat { level: 1.0, held: true });
+        }
+        drop(heat);
+        self.widget.queue_draw();
+    }
+
     pub fn key(&self, code: u16, down: bool) {
         let mut heat = self.heat.borrow_mut();
         let entry = heat.entry(code).or_default();

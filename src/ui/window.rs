@@ -215,6 +215,12 @@ impl Window {
         }
     }
 
+    pub fn keys_held(&self, codes: &[u16]) {
+        if let Some(map) = self.0.heatmap.borrow().as_ref() {
+            map.sync(codes);
+        }
+    }
+
     pub fn chaos(&self, level: f32) {
         let Some((icon, label)) = self.0.chaos.borrow().clone() else { return };
         let (text, class, icon_name) = match level {

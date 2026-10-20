@@ -88,6 +88,8 @@ pub enum Event {
         code: u16,
         down: bool,
     },
+    /// Every physical key currently down, sent when the live view starts.
+    KeysHeld(Vec<u16>),
     Chaos(f32),
     ShortcutRecorded(Shortcut),
     Failed(String),
@@ -379,6 +381,11 @@ impl Engine {
             }
             _ => {}
         }
+        // The live view mirrors the physical keys, so releases must reach it
+        // even when the lock swallows them.
+        if self.monitor && value != 2 {
+            self.send(Event::Key { code, down: value == 1 });
+        }
 
         if value == 1 && self.recording && !keys::is_modifier(code) {
             if let Some(shortcut) = Shortcut::from_held(&self.physical, code) {
@@ -405,16 +412,12 @@ impl Engine {
             return;
         }
 
-        if value != 2 {
-            if self.monitor {
-                self.send(Event::Key { code, down: value == 1 });
-            }
-            if self.lock.is_none()
-                && let Some(rule) = self.detector.key(code, value == 1, self.now())
-            {
-                self.lock(LockReason::Smart(rule), self.cfg.mode, self.cfg.lock_touchpad);
-                return;
-            }
+        if value != 2
+            && self.lock.is_none()
+            && let Some(rule) = self.detector.key(code, value == 1, self.now())
+        {
+            self.lock(LockReason::Smart(rule), self.cfg.mode, self.cfg.lock_touchpad);
+            return;
         }
 
         // Releases and repeats of keys pressed while locked never reached the
@@ -451,7 +454,13 @@ impl Engine {
             Command::Lock { mode, lock_touchpad } => self.lock(LockReason::Manual, mode, lock_touchpad),
             Command::Unlock(reason) => self.unlock(reason),
             Command::SetTouchpadLocked(on) => self.set_pointers_locked(on),
-            Command::Monitor(on) => self.monitor = on,
+            Command::Monitor(on) => {
+                self.monitor = on;
+                // Releases missed while nobody was watching would leave keys lit.
+                if on {
+                    self.send(Event::KeysHeld(self.physical.iter().copied().collect()));
+                }
+            }
             Command::RecordShortcut(on) => self.recording = on,
         }
     }

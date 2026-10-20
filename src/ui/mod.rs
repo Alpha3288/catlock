@@ -397,6 +397,7 @@ impl Controller {
                 }
             }
             Event::Key { code, down } => self.with_window(|w| w.key(code, down)),
+            Event::KeysHeld(codes) => self.with_window(|w| w.keys_held(&codes)),
             Event::Chaos(level) => self.with_window(|w| w.chaos(level)),
             Event::ShortcutRecorded(shortcut) => {
                 self.edit(|c| c.shortcut = shortcut);
