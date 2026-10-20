@@ -11,7 +11,7 @@ use adw::prelude::*;
 use gtk::{gio, glib};
 
 use super::heatmap::HeatMap;
-use super::overlay::{BACKGROUNDS, DEFAULT_MESSAGE, ICONS};
+use super::overlay::{BACKGROUNDS, DEFAULT_MESSAGE, ICONS, MIN_OPACITY};
 use super::{Controller, LockState};
 use crate::config::{APP_ID, LockMode, Profile};
 use crate::detect::SENSITIVITY_LABELS;
@@ -584,7 +584,24 @@ impl Window {
         let w = self.clone();
         tiles.append(&tile(&photo_swatch, "Photo…", move || w.pick_photo()));
         backgrounds.add(&tiles);
+        let opacity = gtk::Scale::with_range(gtk::Orientation::Horizontal, f64::from(MIN_OPACITY), 1.0, 0.05);
+        opacity.set_value(f64::from(screen.opacity));
+        opacity.set_hexpand(true);
+        opacity.set_valign(gtk::Align::Center);
+        opacity.set_format_value_func(|_, v| format!("{:.0}%", v * 100.0));
+        opacity.set_draw_value(true);
+        let w = self.clone();
+        opacity.connect_value_changed(move |s| w.edit_profile(|p| p.screen.opacity = s.value() as f32));
+        let opacity_row = adw::ActionRow::builder()
+            .title("Opacity")
+            .subtitle("Lower lets the desktop show through; text stays solid")
+            .build();
+        opacity_row.add_suffix(&opacity);
+        // Its own group: a preferences group lists rows above any other widget.
+        let opacity_group = adw::PreferencesGroup::new();
+        opacity_group.add(&opacity_row);
         page.add(&backgrounds);
+        page.add(&opacity_group);
 
         let icons = group("Icon", "");
         let icon_tiles = gtk::FlowBox::builder()

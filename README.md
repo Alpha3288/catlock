@@ -14,7 +14,7 @@ lands. It works the same on GNOME, KDE and other Wayland or X11 desktops.
 | Lock modes | Lock screen (overlay and sound), Stealth (no overlay, no sound, notification with Unlock), Built-in keyboard (only the laptop keyboard, released when the external keyboard is unplugged) |
 | Touchpad lock | Optionally lock the laptop touchpad and pointing stick too, and free them again from the notification |
 | Keep awake | Optionally inhibit screen blanking, session lock and suspend while locked, for long builds and renders |
-| Lock screen | Backgrounds (Tabby, Prism, Sage, Midnight, Cream, Dimmed, your own photo), an icon or any emoji, a custom message, and a flash on every blocked key. One window per monitor |
+| Lock screen | Backgrounds (Tabby, Prism, Sage, Midnight, Cream, Dimmed, your own photo) with adjustable opacity, an icon or any emoji, a custom message, and a flash on every blocked key. One window per monitor |
 | Deterrent sounds | Spoken warning, alarm, meow, dog bark, vacuum cleaner, bubbles, purr, lo-fi, or silence. Import your own clip (up to 15 s and 5 MB) |
 | Profiles | Each profile has its own mode, sound and lock screen. Start any profile from the tray |
 | Tray icon | Click to lock or unlock; menu for profiles, Smart Detect and settings |

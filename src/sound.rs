@@ -129,9 +129,9 @@ const PREFERRED_OUTPUTS: [&str; 2] = ["alsa:pipewire", "alsa:pulse"];
 fn output_device() -> Option<rodio::cpal::Device> {
     use rodio::cpal::traits::{DeviceTrait, HostTrait};
     let devices: Vec<_> = rodio::cpal::default_host().output_devices().ok()?.collect();
-    PREFERRED_OUTPUTS.iter().find_map(|want| {
-        devices.iter().find(|d| d.id().is_ok_and(|id| id.to_string() == *want)).cloned()
-    })
+    PREFERRED_OUTPUTS
+        .iter()
+        .find_map(|want| devices.iter().find(|d| d.id().is_ok_and(|id| id.to_string() == *want)).cloned())
 }
 
 fn open_sink(device: Option<rodio::cpal::Device>) -> Option<rodio::MixerDeviceSink> {

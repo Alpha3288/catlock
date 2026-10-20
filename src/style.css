@@ -74,11 +74,21 @@
 
 /* Overlay windows. */
 window.catlock-overlay {
+  background: transparent;
   color: #ffffff;
 }
 
-window.catlock-overlay.bg-cream {
+window.catlock-overlay.on-light {
   color: #3b2a1a;
+}
+
+/* Keeps the message readable over whatever shows through a faded background. */
+window.catlock-overlay label {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
+}
+
+window.catlock-overlay.on-light label {
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.6);
 }
 
 .overlay-frame {

@@ -137,6 +137,8 @@ pub struct LockScreen {
     /// A preset from `ui::overlay::BACKGROUNDS`, or "photo".
     pub background: String,
     pub photo: Option<PathBuf>,
+    /// Background opacity, 0.1 to 1.0; text and buttons stay fully opaque.
+    pub opacity: f32,
     /// An emoji, or empty for no icon.
     pub icon: String,
     /// Empty means the default message.
@@ -146,7 +148,14 @@ pub struct LockScreen {
 
 impl Default for LockScreen {
     fn default() -> Self {
-        Self { background: "tabby".into(), photo: None, icon: "🐱".into(), message: String::new(), flash: true }
+        Self {
+            background: "tabby".into(),
+            photo: None,
+            opacity: 1.0,
+            icon: "🐱".into(),
+            message: String::new(),
+            flash: true,
+        }
     }
 }
 

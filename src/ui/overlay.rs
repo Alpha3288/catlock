@@ -31,6 +31,9 @@ pub const ICONS: &[(&str, &str)] = &[
 
 pub const DEFAULT_MESSAGE: &str = "Keyboard locked";
 
+/// Below this the lock screen is too faint to notice that the keyboard is locked.
+pub const MIN_OPACITY: f32 = 0.1;
+
 pub struct Overlay {
     windows: Vec<gtk::Window>,
     frames: Vec<gtk::Box>,
@@ -64,12 +67,22 @@ impl Overlay {
         for i in 0..monitors.n_items() {
             let Some(monitor) = monitors.item(i).and_downcast::<gdk::Monitor>() else { continue };
             let frame = content(screen, shortcut, &purpose, &slot);
+            // The background sits on its own layer so transparency fades it
+            // without fading the message and buttons drawn above it.
+            let backdrop = gtk::Box::builder().css_classes(["overlay-bg", &format!("bg-{background}")]).build();
+            backdrop.set_opacity(f64::from(screen.opacity.clamp(MIN_OPACITY, 1.0)));
+            let layers = gtk::Overlay::builder().child(&backdrop).build();
+            layers.add_overlay(&frame);
+            let mut classes = vec!["catlock-overlay"];
+            if background == "cream" {
+                classes.push("on-light");
+            }
             let window = gtk::Window::builder()
                 .application(app)
                 .decorated(false)
                 .title("Catlock")
-                .child(&frame)
-                .css_classes(["catlock-overlay", &format!("bg-{background}")])
+                .child(&layers)
+                .css_classes(classes)
                 .build();
             if matches!(purpose, Purpose::Preview) {
                 let click = gtk::GestureClick::new();
@@ -125,8 +138,8 @@ fn photo_provider(display: &gdk::Display, screen: &LockScreen) -> Option<gtk::Cs
     let uri = gtk::gio::File::for_path(path).uri();
     let css = gtk::CssProvider::new();
     css.load_from_string(&format!(
-        "window.catlock-overlay.bg-photo {{ background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)), \
-         url(\"{uri}\"); background-size: cover; background-position: center; color: white; }}"
+        ".overlay-bg.bg-photo {{ background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.55)), \
+         url(\"{uri}\"); background-size: cover; background-position: center; }}"
     ));
     gtk::style_context_add_provider_for_display(display, &css, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION + 1);
     Some(css)
