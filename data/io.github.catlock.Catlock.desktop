@@ -1,0 +1,21 @@
+[Desktop Entry]
+Type=Application
+Name=Catlock
+GenericName=Keyboard Lock
+Comment=Lock the keyboard so your cat can walk on it
+Exec=catlock
+Icon=io.github.catlock.Catlock
+Terminal=false
+Categories=Utility;GTK;
+Keywords=cat;keyboard;lock;paw;
+StartupNotify=true
+X-GNOME-UsesNotifications=true
+Actions=lock;unlock;
+
+[Desktop Action lock]
+Name=Lock Keyboard
+Exec=catlock --lock
+
+[Desktop Action unlock]
+Name=Unlock Keyboard
+Exec=catlock --unlock

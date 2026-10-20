@@ -1,0 +1,116 @@
+/* Warm tabby accent across the app. */
+:root {
+  --accent-bg-color: #e0782a;
+  --accent-fg-color: #ffffff;
+  --accent-color: #b85a12;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --accent-color: #f4a261;
+  }
+}
+
+.hero-icon {
+  font-size: 72px;
+}
+
+.heatmap-card {
+  padding: 12px;
+}
+
+/* Lock screen backgrounds: shared by the settings swatches and the overlay. */
+.bg-tabby {
+  background: linear-gradient(135deg, #f6a04d, #c8642b);
+}
+
+.bg-prism {
+  background: linear-gradient(135deg, #ff5f6d, #ffc371 25%, #47e891 50%, #3ab0ff 75%, #a259ff);
+}
+
+.bg-sage {
+  background: linear-gradient(160deg, #b9cfae, #6f8f68);
+}
+
+.bg-midnight {
+  background: linear-gradient(160deg, #141e30, #243b55);
+}
+
+.bg-cream {
+  background: linear-gradient(160deg, #fff6e9, #f3dcc0);
+}
+
+.bg-dim {
+  background: rgba(18, 14, 10, 0.82);
+}
+
+.bg-tile {
+  min-width: 112px;
+  min-height: 64px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px alpha(currentColor, 0.12);
+}
+
+.photo-tile {
+  background: alpha(currentColor, 0.06);
+}
+
+.bg-tile.selected,
+.icon-tile.selected {
+  box-shadow: 0 0 0 3px var(--accent-bg-color);
+}
+
+.icon-tile {
+  font-size: 30px;
+  min-width: 64px;
+  min-height: 64px;
+  border-radius: 16px;
+  background: alpha(currentColor, 0.06);
+}
+
+.tile-button {
+  padding: 4px;
+}
+
+/* Overlay windows. */
+window.catlock-overlay {
+  color: #ffffff;
+}
+
+window.catlock-overlay.bg-cream {
+  color: #3b2a1a;
+}
+
+.overlay-frame {
+  transition: box-shadow 120ms ease-out;
+}
+
+.overlay-frame.flash {
+  box-shadow: inset 0 0 0 14px rgba(255, 70, 50, 0.85);
+}
+
+.overlay-icon {
+  font-size: 140px;
+}
+
+.overlay-title {
+  font-size: 44px;
+  font-weight: 800;
+}
+
+.overlay-hint {
+  font-size: 20px;
+  opacity: 0.85;
+}
+
+.overlay-reason {
+  font-size: 16px;
+  opacity: 0.75;
+}
+
+.overlay-button {
+  font-size: 16px;
+  padding: 10px 28px;
+  background: alpha(#ffffff, 0.22);
+  color: inherit;
+}
