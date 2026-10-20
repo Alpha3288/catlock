@@ -2,7 +2,7 @@
 
 pkgname=catlock
 pkgver=0.1.0
-pkgrel=3
+pkgrel=4
 pkgdesc='Keyboard lock for cat people, with Smart Detect auto-locking'
 arch=('x86_64' 'aarch64')
 license=('LicenseRef-unknown')
