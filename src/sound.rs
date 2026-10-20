@@ -121,6 +121,37 @@ fn load(id: &str) -> Option<Vec<u8>> {
     }
 }
 
+/// ALSA's `default` PCM is the first sound card unless pipewire-alsa (or the
+/// Pulse equivalent) is installed, which bypasses the output the user picked
+/// in the desktop. The sound servers' own PCMs follow that choice.
+const PREFERRED_OUTPUTS: [&str; 2] = ["alsa:pipewire", "alsa:pulse"];
+
+fn output_device() -> Option<rodio::cpal::Device> {
+    use rodio::cpal::traits::{DeviceTrait, HostTrait};
+    let devices: Vec<_> = rodio::cpal::default_host().output_devices().ok()?.collect();
+    PREFERRED_OUTPUTS.iter().find_map(|want| {
+        devices.iter().find(|d| d.id().is_ok_and(|id| id.to_string() == *want)).cloned()
+    })
+}
+
+fn open_sink(device: Option<rodio::cpal::Device>) -> Option<rodio::MixerDeviceSink> {
+    let builder = match device {
+        Some(device) => rodio::DeviceSinkBuilder::from_device(device),
+        None => rodio::DeviceSinkBuilder::from_default_device(),
+    };
+    match builder.and_then(|b| b.with_error_callback(|_| {}).open_sink_or_fallback()) {
+        Ok(mut sink) => {
+            // Closing an idle stream is routine here, not worth a warning.
+            sink.log_on_drop(false);
+            Some(sink)
+        }
+        Err(e) => {
+            eprintln!("catlock: cannot open audio output: {e}");
+            None
+        }
+    }
+}
+
 struct Request {
     id: String,
     volume: f32,
@@ -135,8 +166,6 @@ pub struct Player {
 }
 
 impl Player {
-    /// Starts the playback thread. Audio is optional: without an output
-    /// device every request is silently dropped.
     /// Starts the playback thread. The output stream is opened only while
     /// something plays: an always-open stream keeps the sound card awake all
     /// day. Without an output device every request is silently dropped.
@@ -145,6 +174,7 @@ impl Player {
         std::thread::Builder::new()
             .name("catlock-sound".into())
             .spawn(move || {
+                let device = output_device();
                 let mut sink: Option<rodio::MixerDeviceSink> = None;
                 let mut current: Option<rodio::Player> = None;
                 loop {
@@ -165,9 +195,7 @@ impl Player {
                     let Some(bytes) = load(&req.id) else { continue };
                     let Ok(source) = rodio::Decoder::new(Cursor::new(bytes)) else { continue };
                     if sink.is_none() {
-                        sink = rodio::DeviceSinkBuilder::from_default_device()
-                            .and_then(|b| b.with_error_callback(|_| {}).open_sink_or_fallback())
-                            .ok();
+                        sink = open_sink(device.clone());
                     }
                     let Some(sink) = sink.as_ref() else { continue };
                     let player = rodio::Player::connect_new(sink.mixer());
@@ -190,5 +218,26 @@ impl Player {
         if id != SILENT {
             let _ = self.tx.send(Request { id: id.into(), volume, interrupt: true });
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn builtin_clips_decode() {
+        for clip in BUILTIN {
+            let decoder = rodio::Decoder::new(Cursor::new(clip.data.to_vec())).expect(clip.id);
+            assert!(decoder.total_duration().is_some_and(|d| d <= MAX_IMPORT_LENGTH), "{}", clip.id);
+        }
+    }
+
+    /// Audible check, run by hand: `cargo test -- --ignored preview_plays`.
+    #[test]
+    #[ignore]
+    fn preview_plays() {
+        Player::spawn().preview("meow", 0.6);
+        std::thread::sleep(Duration::from_millis(1500));
     }
 }
