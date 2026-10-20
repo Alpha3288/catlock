@@ -76,3 +76,8 @@ Settings live in `~/.config/catlock/config.toml`; imported sounds in `~/.local/s
 
 - The built-in sounds are synthesized by `tools/gen_sounds.py` (stdlib only, plus `espeak-ng` for
   the spoken warning): `uv run --no-project python tools/gen_sounds.py`.
+
+## License
+
+Catlock is free software, licensed under the GNU General Public License v3.0 or later. See
+[LICENSE](LICENSE).

@@ -859,6 +859,7 @@ impl Window {
                 .version(env!("CARGO_PKG_VERSION"))
                 .comments("Keyboard lock for cat people. Lock the keys, love the cat.")
                 .developer_name("Andrea Niccoli")
+                .license_type(gtk::License::Gpl30)
                 .build()
                 .present(Some(&w.0.window));
         });
